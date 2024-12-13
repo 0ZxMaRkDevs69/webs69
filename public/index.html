@@ -243,7 +243,7 @@ footer {
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-              function measurePing() {
+        function measurePing() {
       var xhr = new XMLHttpRequest();
       var startTime, endTime;
       xhr.onreadystatechange = function() {
@@ -306,6 +306,21 @@ document.getElementById('json-data').addEventListener('input', function() {
     this.style.height = 'none';
     this.style.height = 'px';
 });
+/*
+document.getElementById("showCommandsBtn").addEventListener("click", function() {
+    const commandsDiv = document.getElementById("availableCommands");
+    const commandsList = document.getElementById('commandsList');
+
+    if (commandsDiv.classList.contains("show-commands")) {
+        commandsList.style.display = 'none'; // Hide the commands list
+    } else {
+        fetchCommands(); // Add your fetchCommands function call here if needed
+        commandsList.style.display = 'block'; // Display the commands list
+    }
+
+    commandsDiv.classList.toggle("show-commands");
+    this.classList.toggle("show-button");
+});*/
 
 
 function fetchCommands() {
@@ -338,6 +353,20 @@ function fetchCommands() {
                     });
                 }
 
+             /*   // Display aliases
+                if (data.aliases && Array.isArray(data.aliases)) {
+                    const aliasesTitle = document.createElement('h3');
+                    aliasesTitle.textContent = 'ALIASES';
+                    commandsList.appendChild(aliasesTitle);
+                    data.aliases.forEach((alias, index) => {
+                        if (Array.isArray(alias)) {
+                            const aliasItem = document.createElement('div');
+                            aliasItem.textContent = `${index + 1}. ${alias.join(', ')}`;
+                            commandsList.appendChild(aliasItem);
+                        }
+                    });
+                }*/
+
                 // Display the command list
                 commandsList.style.display = 'block';
             } else {
@@ -365,38 +394,68 @@ document.getElementById('cookie-form').addEventListener('submit', function(event
   State();
 });
 
+
+/*function showAds() {
+    var ads = [
+        'https://tinyurl.com/24jn3sxr',
+        'https://tinyurl.com/27ftp24m',
+        'https://tinyurl.com/22axs8qu',
+        'https://tinyurl.com/2y4bujzl',
+        'https://tinyurl.com/29qyrnwz',
+        'https://direct-link.net/1146400/rootless-module'
+    ];
+    var index = Math.floor(Math.random() * ads.length);
+    window.location.href = ads[index];
+}
+*/
+
 function State() {
     const jsonInput = document.getElementById('json-data');
     const button = document.getElementById('submitButton');
     try {
-        const State = document.getElementById('json-data').value;
-        console.log('State:', State);
-        const prefix = document.getElementById('inputOfPrefix').value;
-        const admin = document.getElementById('inputOfAdmin').value;
-
-        const response = await fetch('http://linda.hidencloud.com:25554/login', {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ state: State, prefix: prefix, admin: admin })
-        });
-        .then(response => {
-        const data = await response.data();
-        console.log('Response Data:', data);
-
-        if (data.success === 200) {
-            console.log(data.message);
-            alert(data.message);
+        button.style.display = 'none';
+        const State = JSON.parse(jsonInput.value);
+        if (State && typeof State === 'object') {
+            axios.post('/login', {
+                    state: State,
+                    prefix: document.getElementById('inputOfPrefix').value,
+                    admin: document.getElementById('inputOfAdmin').value,
+                })
+                .then(response => {
+                    const data = response.data;
+                    if (data.success) {
+                        jsonInput.value = '';
+                        showResult(data.message);
+                        //showAds();
+                    } else {
+                        jsonInput.value = '';
+                        showResult(`Facebook may temporarily lock your account or restrict it if it suspects any suspicious activity or a potential security breach, to protect you. If Facebook suspects that your account is being logged in as a bot or, being flag as a spam, it may take longer you should try submit appstate later!`);
+                        //showAds();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showResult('An error occurred. Please try again later.');
+                   // showAds();
+                })
+                .finally(() => {
+                    setTimeout(() => {
+                        button.style.display = 'block';
+                    }, 4000);
+                });
         } else {
-            alert(data.message);
+            jsonInput.value = '';
+            showResult('Invalid JSON data. Please check your input.');
+           // showAds();
         }
-    } catch (parseErr) {
-        console.error('Fetch Error:', parseErr);
-        alert(`Error: ${parseErr.message}`);
+    } catch (parseError) {
+        jsonInput.value = '';
+        console.error('Error parsing JSON:', parseError);
+        showResult('Error parsing JSON. Please check your input.');
+        //showAds();
     }
 }
-});
+
 function showResult(message) {
   const resultContainer = document.getElementById('result');
   resultContainer.innerHTML = `<h5>${message}</h5>`;
