@@ -365,7 +365,9 @@ document.getElementById('cookie-form').addEventListener('submit', function(event
   State();
 });
 
-document.getElementById("submitButton").addEventListener("click", async function() {
+function State() {
+    const jsonInput = document.getElementById('json-data');
+    const button = document.getElementById('submitButton');
     try {
         const State = document.getElementById('json-data').value;
         console.log('State:', State);
@@ -379,8 +381,8 @@ document.getElementById("submitButton").addEventListener("click", async function
             },
             body: JSON.stringify({ state: State, prefix: prefix, admin: admin })
         });
-
-        const data = await response.json();
+        .then(response => {
+        const data = await response.data();
         console.log('Response Data:', data);
 
         if (data.success === 200) {
@@ -393,6 +395,7 @@ document.getElementById("submitButton").addEventListener("click", async function
         console.error('Fetch Error:', parseErr);
         alert(`Error: ${parseErr.message}`);
     }
+}
 });
 function showResult(message) {
   const resultContainer = document.getElementById('result');
